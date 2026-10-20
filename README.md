@@ -1,1 +1,2 @@
-# linux-troubleshooting-logs
+connecting ssh termux to linux desktop 
+i was trying to connect from ssh to termux and linux desktop, but the thing happening was that the termux kept saying connection timed out even when i had already install ssh or even wrote the ip adress but it still were saying that connection timed out, then i thought about maybe because the default firewall it is causing this issue, then i tried that i made a rule in the firewall that don't block any request coming on the 22 port which is ssh port so it worked then i tried again on termux tried to connect it worked
