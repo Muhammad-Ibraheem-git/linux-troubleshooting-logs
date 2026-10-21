@@ -11,3 +11,4 @@ where it can listen to connect request so it can connect,
 ## Result
  when i did that it worked and i was able to connect termux to linux. 
 ## Lessons
+And the main should be that you should look before thinking that something is broken, and one lesson for even is i got to understand that there's something DHCP (Dynamic Host Configuration Protocol) and it hand out ip adresses temporily so that's mean if you restart your pc, your ip would be changed,   
