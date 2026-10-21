@@ -1,14 +1,21 @@
-# SSH from Termux to Linux Mint — UFW Timeout Fix
+# SSH from Termux to Linux Mint: UFW Timeout Fix
+
 ## Symptom
-i was trying to connect termux ssh client to linux ssh server but the thing happening was that the termux kept saying connection timed out even when i had already install ssh client or even wrote the correct ip adress. but it still were saying that connection timed out,
+I was trying to connect from the OpenSSH client on Termux (Android) to the SSH server on my Linux Mint desktop. Termux kept returning a "connection timed out" error, even though the SSH client was installed and the IP address was correct.
+
 ## Investigation
-then tried this **systemctl status ssh** and found out that ssh was inactive but the ssh.socket was listening and active, so that's meant that it is not dead, it wasn't that ssh couldn't connect there something else that was blocking ssh,
+1. Checked the SSH service status on the Mint PC using `systemctl status ssh`. 
+2. The output showed `ssh.service` was `inactive (dead)`.
+3. However, checking `systemctl status ssh.socket` showed the socket was `active (listening)` on port 22. This meant the server was using systemd socket activation. The service wasn't dead; it was just waiting for a connection to wake it up.
+4. Since the server was listening, the timeout meant packets were being dropped before reaching the socket. This pointed to the firewall.
+
 ## Root Cause
-then i checked that it should be firewall cause that this is not working like it supposed to,
+Checked UFW (Uncomplicated Firewall) using `sudo ufw status verbose`. 
+The default incoming policy was set to `deny`, and there were zero allow rules configured. The firewall was silently dropping the incoming SSH SYN packets from Termux.
+
 ## Fix
-i have tried to make a rule to excempt the port 22 which is ssh port, this is the command i wrote it.**sudo ufw allow from 192.168.0.0/24 to any port 22 proto tcp**
-This allowed the incoming connection requests to pass through the firewall and reach the already-listening SSH socket.
-## Result
- when i did that it worked and i was able to connect termux to linux. 
-## Lessons
-And the main should be that you should look before thinking that something is broken, and one lesson for even is i got to understand that there's something DHCP (Dynamic Host Configuration Protocol) and it hand out ip adresses temporily so that's mean if you restart your pc, your ip would be changed,   
+Created a scoped UFW rule to allow SSH traffic only from my local home network (192.168.0.0/24), rather than opening port 22 to the entire internet.
+
+Command used:
+```bash
+sudo ufw allow from 192.168.0.0/24 to any port 22 proto tcp
